@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Mplayer</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_media_player">MediaPlayer</string>
+    <string name="media_url_mp4">http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4</string>
+    <string name="retry">Retry</string>
+    <string name="next_video">Next</string>
+    <string name="btn_load_more">Load More</string>
+</resources>
