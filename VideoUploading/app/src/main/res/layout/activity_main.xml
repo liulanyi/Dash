@@ -15,7 +15,7 @@
         android:layout_height="48dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:text="Take a picture!"/>
+        android:text="Take a video!"/>
 
     <VideoView
         android:layout_width="wrap_content"
