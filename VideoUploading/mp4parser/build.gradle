@@ -1,0 +1,2 @@
+configurations.create("default")
+artifacts.add("default", file('isoparser-1.0-RC-2.jar'))

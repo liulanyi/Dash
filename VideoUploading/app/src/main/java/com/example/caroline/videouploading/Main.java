@@ -3,6 +3,9 @@ package com.example.caroline.videouploading;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -21,10 +24,11 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+
 public class Main extends AppCompatActivity {
 
     private Button takePictureButton;
-    private Uri file;
+    private Uri videoUri;
     private VideoView mVideoView ;
 
     File savedVideo;
@@ -53,7 +57,7 @@ public class Main extends AppCompatActivity {
 
                     Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
 
-                    Uri videoUri = Uri.fromFile(savedVideo);
+                    videoUri = Uri.fromFile(savedVideo);
 
                     takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
 
@@ -83,7 +87,20 @@ public class Main extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 
+        // check the resolution of the video. It is 720p
+        /*MediaMetadataRetriever mRetriever = new MediaMetadataRetriever();
+        mRetriever.setDataSource(filePath);
+        Bitmap frame = mRetriever.getFrameAtTime();
+
+        int width = frame.getWidth();
+        int height = frame.getHeight();
+
+        System.out.println("RRRRRRRRRRRRRRRRRRRR");
+        System.out.println(width);
+        System.out.println(height);*/
+
         mVideoView.setVideoPath(filePath);
         mVideoView.start();
+
     }
 }
