@@ -1,20 +1,11 @@
 package com.example.caroline.videotest;
 
-import android.content.Intent;
-import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
-import android.hardware.camera2.CameraCaptureSession;
-import android.hardware.camera2.CameraDevice;
-import android.media.MediaCodec;
 import android.media.MediaRecorder;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Surface;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.MediaController;
@@ -27,35 +18,27 @@ import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback, MediaRecorder.OnInfoListener, MediaRecorder.OnErrorListener {
 
-    private Button takePictureButton;
-    private Uri videoUri;
-    private SurfaceView mSurView;
-    private SurfaceHolder mSurHolder;
-    private static Surface mSurface;
-    private VideoView mVideoView;
-    private SurfaceTexture surText;
+    private SurfaceHolder mSurHolder ;
+    private VideoView mVideoView ;
 
-    File savedVideo;
-    String filePath;
+    File savedVideo = null;
+    String filePath = null ;
 
-    CameraDevice camera;
-    CameraCaptureSession cameraCaptureSession;
     private Camera mCamera = null;
 
-    MediaCodec mMediaCodec;
 
     // buttons
-    private Button initBtn ;
-    private Button startBtn ;
-    private Button stopBtn ;
-    private Button reviewBtn ;
-    private Button stopReviewBtn ;
+    private Button initBtn = null;
+    private Button startBtn = null ;
+    private Button stopBtn = null;
+    private Button reviewBtn = null;
+    private Button stopReviewBtn = null;
     private TextView recordingMsg ;
 
     private static final String TAG = "RecordVideo";
 
     private MediaRecorder recorder = null;
-    private String outputDirectory ;
+    private String outputDirectory = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,39 +54,15 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         recordingMsg = (TextView) findViewById(R.id.recording);
         mVideoView = (VideoView) this.findViewById(R.id.videoView);
 
-/*
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            takePictureButton.setEnabled(false);
-            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE }, 0);
-        }*/
-/*
-        takePictureButton.setOnClickListener(new View.OnClickListener() {
+        outputDirectory = Environment.getExternalStorageDirectory() + "/Movies";
 
-        startBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    savedVideo = File.createTempFile("video1_", ".mp4", new File(Environment.getExternalStorageDirectory() + "/Movies"));
-                    filePath = savedVideo.getPath();
+        try {
+            savedVideo = File.createTempFile("video1_", ".mp4", new File(outputDirectory));
 
-                    Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-
-                    videoUri = Uri.fromFile(savedVideo);
-
-                    takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
-
-                    //System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-                    //System.out.println(filePath);
-
-                    startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
-
-
-                } catch (Exception e) {
-                    Toast.makeText(getApplicationContext(), "exp1 " + e.getMessage(), Toast.LENGTH_LONG).show();
-                }
-
-            }
-        });*/
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void buttonTapped (View view){
@@ -132,15 +91,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             return;
         }
 
-        outputDirectory = Environment.getExternalStorageDirectory() + "/Movies";
-
-        try {
-            savedVideo = File.createTempFile("video1_", ".mp4", new File(outputDirectory));
-
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
 
         if (savedVideo.exists())
             savedVideo.delete();
@@ -148,13 +98,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         try {
             mCamera.stopPreview();
-            //mCamera.unlock();
             recorder = new MediaRecorder();
-            //Toast.makeText(getApplicationContext(), "here", Toast.LENGTH_LONG).show();
             recorder.setCamera(mCamera);
             mCamera.unlock();
-            //recorder.getSurface();
-            //Toast.makeText(getApplicationContext(), "here2", Toast.LENGTH_LONG).show();
+
             recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
             recorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
             recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
@@ -163,7 +110,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
             recorder.setVideoSize(1280, 720); // 720p
             recorder.setVideoFrameRate(30) ; // 30 fps
-            //recorder.setCaptureRate(30) ; // 30 fps
             recorder.setVideoEncodingBitRate(5000000); // 5Mbps
             recorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
             recorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
@@ -186,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         try{
             //Thread.sleep(1000);
             recorder.start();
-            //recordingMsg.setText("recording");
+            recordingMsg.setText("recording");
             startBtn.setEnabled(false);
             stopBtn.setEnabled(true);
         }catch (Exception e){
@@ -207,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 e.printStackTrace();
             }
             releaseRecorder();
-            //recordingMsg.setText(" ");
+            recordingMsg.setText(" ");
             releaseCamera();
             startBtn.setEnabled(false);
             stopBtn.setEnabled(false);
@@ -220,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         mVideoView.setMediaController(mc);
         mVideoView.setVideoPath(filePath);
         mVideoView.start();
-        stopBtn.setEnabled(true);
+        stopReviewBtn.setEnabled(true);
     }
 
     private void stopPlayRecording() {
@@ -253,6 +199,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             mCamera.startPreview();
         }
         catch (IOException e){
+            Toast.makeText(getApplicationContext(), "surfaceCreated : " + e.getMessage(), Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
         initBtn.setEnabled(true);
@@ -291,10 +238,29 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             finish();
     }
 
+
+    @Override
+    protected void onStop(){
+        super.onStop();
+        finish();
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        finish();
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        finish();
+    }
+
     private boolean initCamera() {
         try{
             mCamera = Camera.open();
-            //Camera.Parameters camParams = mCamera.getParameters();
+            Camera.Parameters camParams = mCamera.getParameters();
             mCamera.lock();
             mSurHolder = mVideoView.getHolder();
             mSurHolder.addCallback(this);
@@ -307,86 +273,4 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         return true;
     }
 
-
-    static final int REQUEST_VIDEO_CAPTURE = 101;
-
-    private void dispatchTakeVideoIntent() {
-        Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-        if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
-        }
-    }
-/*
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-
-        MediaRecorder recorder = new MediaRecorder();
-        recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-        recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-
-        // video Settings
-        recorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
-        recorder.setVideoSize(720, 1080); // 720p
-        recorder.setCaptureRate(30); // 30 fps
-        recorder.setVideoEncodingBitRate(5000000); // 5Mbps
-        recorder.setOutputFile(filePath);
-        recorder.setPreviewDisplay(mSurface);
-        try {
-            recorder.prepare();
-            recorder.start();   // Recording is now started
-
-            recorder.stop();
-            recorder.reset();   // You can reuse the object by going back to setVideoSource() step
-            recorder.release(); // Now the object cannot be reused
-        } catch (Exception e){
-
-        }
-
-        mVideoView.setVideoPath(filePath);
-        mVideoView.start();
-
-    }
-*/
-    /*public void setSurface(){
-        mSurface = mMediaCodec.createInputSurface();
-    }*/
-
-    /*public void setCamera (){
-        mCamera = Camera.open();
-        Camera.s
-
-    }*/
-/*
-    public void RecordVideo () {
-        //setCamera();
-
-        MediaRecorder recorder = new MediaRecorder();
-
-        recorder.setCamera(mCamera);
-        recorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-
-
-        try {
-            savedVideo = File.createTempFile("video4_", ".mp4", new File(Environment.getExternalStorageDirectory() + "/Movies"));
-            filePath = savedVideo.getPath();
-
-
-            recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-            recorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
-            recorder.setVideoSize(720, 1080); // 720p
-            recorder.setCaptureRate(30); // 30 fps
-            recorder.setVideoEncodingBitRate(5000000); // 5Mbps
-            recorder.setOutputFile(filePath);
-            recorder.setPreviewDisplay(mSurface);
-            recorder.prepare();
-            recorder.start();   // Recording is now started
-
-            recorder.stop();
-            recorder.reset();   // You can reuse the object by going back to setVideoSource() step
-            recorder.release(); // Now the object cannot be reused
-
-        } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "exp1 " + e.getMessage(), Toast.LENGTH_LONG).show();
-        }
-    }*/
 }
