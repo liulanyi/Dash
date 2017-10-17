@@ -14,9 +14,9 @@
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:text="Init"
-        android:layout_above="@+id/start"
-        android:layout_alignParentStart="true"
-        android:onClick="buttonTapped" />
+        android:onClick="buttonTapped"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
 
 
     <VideoView
@@ -24,50 +24,61 @@
         android:layout_height="wrap_content"
         android:id="@+id/videoView"
         android:layout_centerHorizontal="true"
-        android:layout_alignParentTop="true"
-        android:layout_above="@+id/init" />
+        android:layout_below="@+id/start"
+        android:layout_alignParentBottom="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="start"
         android:id="@+id/start"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:onClick="buttonTapped" />
+        android:onClick="buttonTapped"
+        android:layout_below="@+id/init"
+        android:layout_alignParentStart="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="stop"
         android:id="@+id/stop"
-        android:layout_alignParentBottom="true"
-        android:layout_toEndOf="@+id/start"
-        android:onClick="buttonTapped" />
+        android:onClick="buttonTapped"
+        android:layout_below="@+id/review"
+        android:layout_toEndOf="@+id/start" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="review"
         android:id="@+id/review"
-        android:layout_above="@+id/stop"
-        android:layout_alignParentEnd="true"
-        android:onClick="buttonTapped" />
+        android:onClick="buttonTapped"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/stop" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="stop review"
         android:id="@+id/sreview"
-        android:layout_alignParentBottom="true"
-        android:layout_alignEnd="@+id/review"
-        android:onClick="buttonTapped" />
+        android:onClick="buttonTapped"
+        android:layout_below="@+id/review"
+        android:layout_alignStart="@+id/review" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text=" "
         android:id="@+id/recording"
-        android:layout_alignTop="@+id/init"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignEnd="@+id/stop"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/init"
+        android:layout_above="@+id/start" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="send"
+        android:id="@+id/send"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/review"
+        android:onClick="buttonTapped" />
 </RelativeLayout>
