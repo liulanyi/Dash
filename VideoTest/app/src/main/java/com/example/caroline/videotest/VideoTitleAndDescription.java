@@ -49,6 +49,8 @@ public class VideoTitleAndDescription extends AppCompatActivity {
 
                 Toast.makeText(VideoTitleAndDescription.this, "Title : "+ title + " and Description : " + description, Toast.LENGTH_SHORT).show();
 
+                SendToServer sendToServer = new SendToServer(Variables.getTitle(),Variables.getDescription(),Variables.getFilePath());
+
                 Intent returnIntent = new Intent(VideoTitleAndDescription.this, MainActivity.class);
                 startActivity(returnIntent);
             }

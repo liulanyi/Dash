@@ -42,17 +42,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private MediaRecorder recorder = null;
     private String outputDirectory = null;
 
-    private String rootURLnew = "http://monterosa.d1.comp.nus.edu.sg/~team05/new.php"; // POST, Json (title + descritpion)
-     /// return number id
-     /// get id
-     // utiliser l'id pour nommer la video a envoyer
-     /// id-partNumber.mp4  (filepath)
-     // envoyer
-    private String rootURLupload = "http://monterosa.d1.comp.nus.edu.sg/~team05/upload.php"; //
-     // return text (à pop up)
-     // fail : nom existe deja, trop gros (>2M), pas .mp4
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
