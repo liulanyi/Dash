@@ -1,5 +1,6 @@
 package com.example.caroline.videotest;
 
+import android.content.Intent;
 import android.hardware.Camera;
 import android.media.MediaRecorder;
 import android.os.Bundle;
@@ -33,12 +34,25 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private Button stopBtn = null;
     private Button reviewBtn = null;
     private Button stopReviewBtn = null;
+    private Button sendBtn = null;
     private TextView recordingMsg ;
 
     private static final String TAG = "RecordVideo";
 
     private MediaRecorder recorder = null;
     private String outputDirectory = null;
+
+    private String rootURLnew = "http://monterosa.d1.comp.nus.edu.sg/~team05/new.php"; // POST, Json (title + descritpion)
+     /// return number id
+     /// get id
+     // utiliser l'id pour nommer la video a envoyer
+     /// id-partNumber.mp4  (filepath)
+     // envoyer
+    private String rootURLupload = "http://monterosa.d1.comp.nus.edu.sg/~team05/upload.php"; //
+     // return text (à pop up)
+     // fail : nom existe deja, trop gros (>2M), pas .mp4
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         stopBtn = (Button) findViewById(R.id.stop);
         reviewBtn = (Button) findViewById(R.id.review);
         stopReviewBtn = (Button) findViewById(R.id.sreview);
+        sendBtn = (Button) findViewById(R.id.send);
         recordingMsg = (TextView) findViewById(R.id.recording);
         mVideoView = (VideoView) this.findViewById(R.id.videoView);
 
@@ -82,6 +97,12 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             case R.id.sreview:
                 stopPlayRecording();
                 break;
+            case R.id.send:
+                // TODO SendToServer
+                //askTitle();
+                //askDescription();
+                Intent askTitleAndDescription = new Intent(MainActivity.this, VideoTitleAndDescription.class);
+                startActivity(askTitleAndDescription);
         }
     }
 
@@ -95,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         if (savedVideo.exists())
             savedVideo.delete();
         filePath = savedVideo.getPath();
+        Variables.setFilePath(filePath);
 
         try {
             mCamera.stopPreview();
@@ -158,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             startBtn.setEnabled(false);
             stopBtn.setEnabled(false);
             reviewBtn.setEnabled(true);
+            sendBtn.setEnabled(true);
         }
     }
 
@@ -234,6 +257,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         stopBtn.setEnabled(false);
         reviewBtn.setEnabled(false);
         stopReviewBtn.setEnabled(false);
+        sendBtn.setEnabled(false);
         if(!initCamera())
             finish();
     }
