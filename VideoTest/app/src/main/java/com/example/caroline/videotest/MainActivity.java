@@ -96,12 +96,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 startActivity(askTitleAndDescription);
                 break;
             case R.id.cut:
-                SegmentVideos segmentVideos = new SegmentVideos();
-                segmentVideos.setList(filePath);
+                cutVideo();
 
         }
     }
-
 
     private void initRecording() {
         if (recorder != null) {
@@ -145,8 +143,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     }
 
     private void startRecording() {
-        recorder.setOnInfoListener(this);
-        recorder.setOnErrorListener(this);
+        //recorder.setOnInfoListener(this);
+        //recorder.setOnErrorListener(this);
         try{
             //Thread.sleep(1000);
             recorder.start();
@@ -161,8 +159,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     private void stopRecording() {
         if (recorder != null){
-            recorder.setOnErrorListener(null);
-            recorder.setOnInfoListener(null);
+            //recorder.setOnErrorListener(null);
+            //recorder.setOnInfoListener(null);
 
             try{
                 recorder.stop();
@@ -176,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             startBtn.setEnabled(false);
             stopBtn.setEnabled(false);
             reviewBtn.setEnabled(true);
-            sendBtn.setEnabled(true);
+            cutBtn.setEnabled(true);
         }
     }
 
@@ -190,6 +188,13 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     private void stopPlayRecording() {
         mVideoView.stopPlayback();
+    }
+
+
+    private void cutVideo() {
+        SegmentVideos segmentVideos = new SegmentVideos();
+        segmentVideos.setList(filePath);
+        sendBtn.setEnabled(true);
     }
 
     private void releaseRecorder() {
@@ -254,6 +259,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         reviewBtn.setEnabled(false);
         stopReviewBtn.setEnabled(false);
         sendBtn.setEnabled(false);
+        cutBtn.setEnabled(false);
         if(!initCamera())
             finish();
     }

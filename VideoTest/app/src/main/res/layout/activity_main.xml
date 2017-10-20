@@ -87,6 +87,7 @@
         android:layout_height="wrap_content"
         android:text="cut"
         android:id="@+id/cut"
+        android:onClick="buttonTapped"
         android:layout_below="@+id/review"
         android:layout_alignParentEnd="true" />
 </RelativeLayout>

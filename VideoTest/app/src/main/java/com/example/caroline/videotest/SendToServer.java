@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -58,8 +59,10 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
         // rename the videos
         for (int i=0; i<numOfVideos; i++){
             listFilePath.set(i, id + "-" + i + ".mp4");
+            System.out.println("LLLLLLLLLLLLL " + Variables.getListFilePath());
 
-            POST(URLupload, listFilePath.get(i));
+            String response = POST(URLupload, listFilePath.get(i));
+            System.out.println("RESPONSEEEEEEE " + " : " + response);
         }
 
 
@@ -77,16 +80,21 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
             connectionNew.setRequestMethod("POST");
             connectionNew.setDoOutput(true);
 
+            connectionNew.setRequestProperty("Content-Type", "application/json");
 
             // create jsonObject to send title and description
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("title", title);
             jsonObject.put("description", description);
 
-            OutputStreamWriter out = new OutputStreamWriter(connectionNew.getOutputStream());
+            /*OutputStreamWriter out = new OutputStreamWriter(connectionNew.getOutputStream());
             out.write(jsonObject.toString());
             out.flush();
-            out.close();
+            out.close();*/
+
+            OutputStream outputStream = connectionNew.getOutputStream();
+            outputStream.write(jsonObject.toString().getBytes());
+            outputStream.flush();
 
             InputStreamReader in = new InputStreamReader(connectionNew.getInputStream());
             BufferedReader reader = new BufferedReader(in);
