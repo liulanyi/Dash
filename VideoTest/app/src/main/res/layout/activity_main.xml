@@ -78,7 +78,15 @@
         android:layout_height="wrap_content"
         android:text="send"
         android:id="@+id/send"
+        android:onClick="buttonTapped"
         android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/review"
-        android:onClick="buttonTapped" />
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="cut"
+        android:id="@+id/cut"
+        android:layout_below="@+id/review"
+        android:layout_alignParentEnd="true" />
 </RelativeLayout>

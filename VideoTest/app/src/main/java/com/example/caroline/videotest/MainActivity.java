@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private Button reviewBtn = null;
     private Button stopReviewBtn = null;
     private Button sendBtn = null;
+    private Button cutBtn = null;
     private TextView recordingMsg ;
 
     private static final String TAG = "RecordVideo";
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         reviewBtn = (Button) findViewById(R.id.review);
         stopReviewBtn = (Button) findViewById(R.id.sreview);
         sendBtn = (Button) findViewById(R.id.send);
+        cutBtn = (Button) findViewById(R.id.cut);
         recordingMsg = (TextView) findViewById(R.id.recording);
         mVideoView = (VideoView) this.findViewById(R.id.videoView);
 
@@ -92,6 +94,11 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 //askDescription();
                 Intent askTitleAndDescription = new Intent(MainActivity.this, VideoTitleAndDescription.class);
                 startActivity(askTitleAndDescription);
+                break;
+            case R.id.cut:
+                SegmentVideos segmentVideos = new SegmentVideos();
+                segmentVideos.setList(filePath);
+
         }
     }
 

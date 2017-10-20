@@ -36,10 +36,16 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
 
 
 
-    public SendToServer(String title, String description, String filePath){ // TODO change with ListFilePath
+    /*public SendToServer(String title, String description, String filePath){ // TODO change with ListFilePath
         this.title=title;
         this.description=description;
         this.filePath = filePath;
+    }*/
+
+    public SendToServer(String title, String description, ArrayList<String> listFilePath){
+        this.title=title;
+        this.description=description;
+        this.listFilePath = listFilePath;
     }
 
     @Override
@@ -48,6 +54,7 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
         String id = POST(URLnew, title, description);
 
         int numOfVideos = listFilePath.size();
+        System.out.println("NNNNNNNNNNNNNNNNN " +numOfVideos);
         // rename the videos
         for (int i=0; i<numOfVideos; i++){
             listFilePath.set(i, id + "-" + i + ".mp4");
