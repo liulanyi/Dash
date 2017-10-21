@@ -80,12 +80,14 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
             connectionNew.setRequestMethod("POST");
             connectionNew.setDoOutput(true);
 
-            connectionNew.setRequestProperty("Content-Type", "application/json");
+            connectionNew.setRequestProperty("Content-Type", "application/json"); // charset=UTF-8");
 
             // create jsonObject to send title and description
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("title", title);
             jsonObject.put("description", description);
+
+            System.out.println("JSONNNN : " + jsonObject.toString());
 
             /*OutputStreamWriter out = new OutputStreamWriter(connectionNew.getOutputStream());
             out.write(jsonObject.toString());
@@ -93,8 +95,9 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
             out.close();*/
 
             OutputStream outputStream = connectionNew.getOutputStream();
-            outputStream.write(jsonObject.toString().getBytes());
+            outputStream.write(jsonObject.toString().getBytes()); // .getBytes("UTF-8"));
             outputStream.flush();
+            outputStream.close();
 
             InputStreamReader in = new InputStreamReader(connectionNew.getInputStream());
             BufferedReader reader = new BufferedReader(in);
@@ -107,8 +110,11 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
             //Close our InputStream and Buffered reader
             reader.close();
             in.close();
+
+            //connectionNew.disconnect();
             //Set our result equal to our stringBuilder
             id = stringBuilder.toString();
+            System.out.println("IIDDDDDD " + id );
 
             return id ;
 
@@ -151,6 +157,8 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
             in.close();
             //Set our result equal to our stringBuilder
             result = stringBuilder.toString();
+
+            connectionUpLoad.disconnect();
 
             return result ;
         }catch (Exception e){
