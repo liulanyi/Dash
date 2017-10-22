@@ -25,7 +25,9 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
 
     String FromServer;
 
-    private String URLnew = "http://monterosa.d1.comp.nus.edu.sg/~team05/new.php"; // POST, Json (title + descritpion)
+    //private String URLnew = "http://monterosa.d1.comp.nus.edu.sg/~team05/new.php"; // POST, Json (title + descritpion)
+    private String URLnew ="https://perso.telecom-paristech.fr/lperache/new.php"; // TODO change
+
     /// return number id
     /// get id
     // utiliser l'id pour nommer la video a envoyer

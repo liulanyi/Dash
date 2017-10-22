@@ -12,6 +12,8 @@ public class Variables {
 
     private static String filePath;
     private static ArrayList<String> listFilePath ;
+    private static String workingPath;
+    private static String filePathWithoutExt;
 
     // Getter and Setter de title
     public static String getTitle(){return title;}
@@ -26,7 +28,13 @@ public class Variables {
     public static void setFilePath(String filePath) {Variables.filePath = filePath;}
 
     public static ArrayList<String> getListFilePath() {return listFilePath;}
-
     public static void setListFilePath(ArrayList<String> listFilePath) {Variables.listFilePath = listFilePath;}
+
+    public static String getWorkingPath(){return workingPath;}
+    public static void setWorkingPath(String workingPath){Variables.workingPath = workingPath;}
+
+    public static String getFilePathWithoutExt(){return filePathWithoutExt;}
+    public static void setFilePathWithoutExt(String filePathWithoutExt){Variables.filePathWithoutExt = filePathWithoutExt;}
+
 }
 

@@ -43,12 +43,16 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private MediaRecorder recorder = null;
     private String outputDirectory = null;
 
+    private String workingPath ;
+    private String filePathWithoutExt ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        this.workingPath = Environment.getExternalStorageDirectory() + "/Movies";
+        Variables.setWorkingPath(workingPath);
         // references of the buttons
         initBtn = (Button) findViewById(R.id.init);
         startBtn = (Button) findViewById(R.id.start);
@@ -111,6 +115,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             savedVideo.delete();
         filePath = savedVideo.getPath();
         Variables.setFilePath(filePath);
+
+        filePathWithoutExt = (filePath != null) ? filePath.substring(0, filePath.indexOf('.')) : "";
+        //filePathWithoutExt =  savedVideo.getName().substring(0, savedVideo.getName().indexOf('.'));
+        Variables.setFilePathWithoutExt(filePathWithoutExt);
 
         try {
             mCamera.stopPreview();
