@@ -33,7 +33,8 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
     // utiliser l'id pour nommer la video a envoyer
     /// id-partNumber.mp4  (filepath)
     // envoyer
-    private String URLupload = "http://monterosa.d1.comp.nus.edu.sg/~team05/upload.php"; //
+    //private String URLupload = "http://monterosa.d1.comp.nus.edu.sg/~team05/upload.php"; //
+    private String URLupload = "https://perso.telecom-paristech.fr/lperache/upload.php"; // TODO change
     // return text (à pop up)
     // fail : nom existe deja, trop gros (>2M), pas .mp4
 
