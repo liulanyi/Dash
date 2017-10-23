@@ -201,7 +201,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     private void cutVideo() {
         SegmentVideos segmentVideos = new SegmentVideos();
-        segmentVideos.setList(filePath);
+        //segmentVideos.setList(filePath);
+        segmentVideos.segmentVideo();
         sendBtn.setEnabled(true);
     }
 
