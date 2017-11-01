@@ -72,7 +72,7 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
         for (int i=0; i<numOfVideos; i++){
             //setFileName(listFilePath.get(i), id + "-" + i + ".mp4");
             try {
-                Thread.sleep(2000);
+                //Thread.sleep(2000);
                 System.out.println("LLLLLLLLLLLLL " + Variables.getListFilePath());
                 System.out.println(listFilePath.get(i));
                 copy = exportFile(listFilePath.get(i), Variables.getWorkingPath()+ "/" + id + "-" + i + ".mp4");
