@@ -1,5 +1,7 @@
 package com.example.caroline.videotest;
 
+import android.util.Log;
+
 import com.coremedia.iso.IsoFile;
 import com.coremedia.iso.boxes.Container;
 import com.googlecode.mp4parser.authoring.Movie;
@@ -22,8 +24,10 @@ public class SegmentVideos {
 
     private double duration ;
     private int numberOfSmallVideos;
+    //private int startTime = 0;
     private double startTime = 0.0;
     private double endTime;
+    private double splitDuration = 3.0;
     private double lastStartTime;
     private String filePath;
 
@@ -37,6 +41,8 @@ public class SegmentVideos {
     }
 
     public void segmentVideo(){
+        double startTime = 0 ;
+        double splitDuration = 3.0 ;
         try {
             //duration = getDuration(tracks.get(0)) / tracks.get(0).getTrackMetaData().getTimescale();
 
@@ -50,11 +56,20 @@ public class SegmentVideos {
             ArrayList<String> listNameOf3sVideos = new ArrayList<String>();
 
             for (int num = 0; num < numberOfSmallVideos; num++) {
-                cutVideo3sec(startTime, startTime+3.0, num, listNameOf3sVideos);
-                startTime = startTime+3.0;
+                System.out.println("START and END " + startTime + " " + (startTime + splitDuration));
+                if (startTime == 0){
+                    cutVideo3sec(startTime, startTime+splitDuration, num, listNameOf3sVideos);
+                    startTime += splitDuration;
+                }
+                else {
+                    cutVideo3sec(startTime+1, startTime+splitDuration, num, listNameOf3sVideos);
+                    startTime += splitDuration;
+                }
+
+
             }
             // last part of the video, which duration is less than 3 sec
-            cutVideo3sec(startTime, duration, numberOfSmallVideos, listNameOf3sVideos);
+            cutVideo3sec(startTime+1, duration, numberOfSmallVideos, listNameOf3sVideos);
 
             Variables.setListFilePath(listNameOf3sVideos);
             System.out.println("LISTTTTTT");
@@ -94,7 +109,7 @@ public class SegmentVideos {
         }
         double previous = 0;
         for (double timeOfSyncSample : timeOfSyncSamples) {
-            if (timeOfSyncSample > cutHere) {
+            if (timeOfSyncSample >= cutHere) {
                 if (next) {
                     return timeOfSyncSample;
                 } else {
@@ -143,25 +158,30 @@ public class SegmentVideos {
             for (Track track : tracks) {
                 long currentSample =  0;
                 double currentTime = 0 ;
-                long startSample = -1;
-                long endSample = -1;
+                double lastTime = 0;
+                long startSample = 0;
+                long endSample = 0;
 
                 for (int j = 0; j < track.getSampleDurations().length; j++) {
-                    if (currentTime <= startTime) {
+                    long delta = track.getSampleDurations()[j];
+                    if (currentTime > lastTime && currentTime <= startTime) { //currentTime > lastTime &&
                         // current sample is still before the new starttime
                         startSample = currentSample;
                     }
-                    if (currentTime <= endTime) {
+                    if (currentTime <= endTime) { //currentTime > lastTime &&
                         // current sample is after the new start time and still before the new endtime
                         endSample = currentSample;
                     } else {
                         // current sample is after the end of the cropped video
                         break;
                     }
-                    currentTime += (double) track.getSampleDurations()[j] / (double) track.getTrackMetaData().getTimescale();
+                    lastTime = currentTime;
+                    currentTime += (double) delta / (double) track.getTrackMetaData().getTimescale();
                     currentSample++;
                 }
+                Log.i("DASH", "Start time = " + startTime + ", End time = " + endTime);
                 movie.addTrack(new CroppedTrack(track, startSample, endSample));
+                //movie.addTrack(new CroppedTrack(track, (long) startTime, (long) endTime));
             }
             Container out = new DefaultMp4Builder().build(movie);
             String filename = Variables.getFilePathWithoutExt()+"_"+ String.valueOf(i)+".mp4";

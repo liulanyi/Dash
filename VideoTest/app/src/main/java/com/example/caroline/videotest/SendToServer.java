@@ -1,7 +1,6 @@
 package com.example.caroline.videotest;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -73,10 +72,10 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
         for (int i=0; i<numOfVideos; i++){
             //setFileName(listFilePath.get(i), id + "-" + i + ".mp4");
             try {
+                Thread.sleep(2000);
                 System.out.println("LLLLLLLLLLLLL " + Variables.getListFilePath());
                 System.out.println(listFilePath.get(i));
                 copy = exportFile(listFilePath.get(i), Variables.getWorkingPath()+ "/" + id + "-" + i + ".mp4");
-                System.out.println(copy.getAbsolutePath());
                 System.out.println(copy.getPath());
 
             }catch (Exception e){
@@ -87,6 +86,7 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
             String response = POST(URLupload, copy.getPath());
             //String response = POST(URLupload, id + "-" + i + ".mp4");
             System.out.println("RESPONSEEEEEEE" + " : " + response);
+
         }
 
 
@@ -193,10 +193,10 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
 
         int serverResponseCode;
 
-        if (!file.isFile()) {
+        /*if (!file.isFile()) {
             Log.e("Huzza", "Source File Does not exist");
             return null;
-        }
+        }*/
 
         try{
             FileInputStream inputStream = new FileInputStream(file);
