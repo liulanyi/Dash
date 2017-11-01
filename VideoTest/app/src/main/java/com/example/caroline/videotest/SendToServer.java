@@ -1,6 +1,7 @@
 package com.example.caroline.videotest;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -83,8 +84,8 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
             }
             listFilePath.set(i, Variables.getWorkingPath() + "/"+ id + "-" + i + ".mp4");
 
-            //String response = POST(URLupload, copy.getPath());
-            String response = POST(URLupload, id + "-" + i + ".mp4");
+            String response = POST(URLupload, copy.getPath());
+            //String response = POST(URLupload, id + "-" + i + ".mp4");
             System.out.println("RESPONSEEEEEEE" + " : " + response);
         }
 
@@ -173,18 +174,30 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
         return id;
     }
 
-    public static String POST(String urlString, String fileName){
+    public static String POST(String urlString, String filePath){
         String result = "";
         String inputLine;
 
-        String filePath = Variables.getWorkingPath() + "/"+ fileName ;
+        //String filePath = Variables.getWorkingPath() + "/"+ fileName ;
         File file = new File(filePath);
+        DataOutputStream dos = null;
 
+        String lineEnd = "\r\n";
+        String twoHyphens = "--";
+        String boundary = "*****";
         int bytesRead,bytesAvailable,bufferSize;
         byte[] buffer;
         int maxBufferSize = 1 * 1024 * 1024;
 
         HttpURLConnection connectionUpLoad = null;
+
+        int serverResponseCode;
+
+        if (!file.isFile()) {
+            Log.e("Huzza", "Source File Does not exist");
+            return null;
+        }
+
         try{
             FileInputStream inputStream = new FileInputStream(file);
 
@@ -195,8 +208,9 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
             connectionUpLoad.setDoInput(true);
 
             connectionUpLoad.setRequestProperty("Connection", "Keep-Alive");
-            connectionUpLoad.setRequestProperty("Enctype", "multipart/form-data");
-            connectionUpLoad.setRequestProperty("fileToUpload",fileName);
+            connectionUpLoad.setRequestProperty("ENCTYPE", "multipart/form-data");
+            connectionUpLoad.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+            connectionUpLoad.setRequestProperty("fileToUpload",filePath);
 
             //OutputStreamWriter out = new OutputStreamWriter(connectionUpLoad.getOutputStream());
             //out.write(filePath); // TODO Maybe to change
@@ -204,11 +218,12 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
             //OutputStream out = connectionUpLoad.getOutputStream();
             //out.write(file.getBytes());
 
-            DataOutputStream out = new DataOutputStream(connectionUpLoad.getOutputStream());
+            dos = new DataOutputStream(connectionUpLoad.getOutputStream());
 
 
-            out.writeBytes("Content-Disposition: form-data; name=\"fileToUpload\";filename=\"" + fileName);
-            //out.writeBytes(filePath);
+            dos.writeBytes(twoHyphens + boundary + lineEnd);
+            dos.writeBytes("Content-Disposition: form-data; name=\"fileToUpload\";filename=\"" + filePath + "\"" + lineEnd);
+            dos.writeBytes(lineEnd);
 
             bytesAvailable = inputStream.available();
             //selecting the buffer size as minimum of available bytes or 1 MB
@@ -222,33 +237,46 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
             //loop repeats till bytesRead = -1, i.e., no bytes are left to read
             while (bytesRead > 0){
                 //write the bytes read from inputstream
-                out.write(buffer,0,bufferSize);
+                dos.write(buffer, 0, bufferSize);
                 bytesAvailable = inputStream.available();
                 bufferSize = Math.min(bytesAvailable,maxBufferSize);
                 bytesRead = inputStream.read(buffer,0,bufferSize);
             }
 
-            out.flush();
-            out.close();
-            inputStream.close();
+            dos.writeBytes(lineEnd);
+            dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
 
-            InputStreamReader in = new InputStreamReader(connectionUpLoad.getInputStream());
-            BufferedReader reader = new BufferedReader(in);
-            StringBuilder stringBuilder = new StringBuilder();
-            //Check if the line we are reading is not null
-            while((inputLine = reader.readLine()) != null){
-                stringBuilder.append(inputLine);
+            serverResponseCode = connectionUpLoad.getResponseCode();
+
+            inputStream.close();
+            dos.flush();
+            dos.close();
+
+
+            if (serverResponseCode==200){
+                InputStreamReader in = new InputStreamReader(connectionUpLoad.getInputStream());
+                BufferedReader reader = new BufferedReader(in);
+                StringBuilder stringBuilder = new StringBuilder();
+                //Check if the line we are reading is not null
+                while((inputLine = reader.readLine()) != null){
+                    stringBuilder.append(inputLine);
+                }
+
+                //Close our InputStream and Buffered reader
+                reader.close();
+                in.close();
+                //Set our result equal to our stringBuilder
+                result = stringBuilder.toString();
+
+                connectionUpLoad.disconnect();
+
+
+                return result ;
+            }
+            else {
+                return "could not upload";
             }
 
-            //Close our InputStream and Buffered reader
-            reader.close();
-            in.close();
-            //Set our result equal to our stringBuilder
-            result = stringBuilder.toString();
-
-            connectionUpLoad.disconnect();
-
-            return result ;
         }catch (Exception e){
             e.printStackTrace();
         }finally {
