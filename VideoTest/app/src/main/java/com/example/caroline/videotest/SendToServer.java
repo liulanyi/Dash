@@ -5,11 +5,17 @@ import android.os.AsyncTask;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
 /**
@@ -21,20 +27,21 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
     private String description ;
 
     private ArrayList<String> listFilePath;
+    private ArrayList<String> oldlistFilePath ;
     private String filePath;
 
     String FromServer;
 
-    //private String URLnew = "http://monterosa.d1.comp.nus.edu.sg/~team05/new.php"; // POST, Json (title + descritpion)
-    private String URLnew ="https://perso.telecom-paristech.fr/lperache/new.php"; // TODO change
+    private String URLnew = "http://monterosa.d2.comp.nus.edu.sg/~team05/new.php"; // POST, Json (title + descritpion)
+    //private String URLnew ="https://perso.telecom-paristech.fr/lperache/new.php"; // TODO change
 
     /// return number id
     /// get id
     // utiliser l'id pour nommer la video a envoyer
     /// id-partNumber.mp4  (filepath)
     // envoyer
-    //private String URLupload = "http://monterosa.d1.comp.nus.edu.sg/~team05/upload.php"; //
-    private String URLupload = "https://perso.telecom-paristech.fr/lperache/upload.php"; // TODO change
+    private String URLupload = "http://monterosa.d2.comp.nus.edu.sg/~team05/upload.php"; //
+    //private String URLupload = "https://perso.telecom-paristech.fr/lperache/upload.php"; // TODO change
     // return text (à pop up)
     // fail : nom existe deja, trop gros (>2M), pas .mp4
 
@@ -50,6 +57,7 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
         this.title=title;
         this.description=description;
         this.listFilePath = listFilePath;
+        this.oldlistFilePath = listFilePath;
     }
 
     @Override
@@ -58,18 +66,56 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
         String id = POST(URLnew, title, description);
 
         int numOfVideos = listFilePath.size();
-        System.out.println("NNNNNNNNNNNNNNNNN " +numOfVideos);
+        System.out.println("NNNNNNNNNNNNNNNNN " + numOfVideos);
+        File copy = null ;
         // rename the videos
         for (int i=0; i<numOfVideos; i++){
-            listFilePath.set(i, id + "-" + i + ".mp4");
-            System.out.println("LLLLLLLLLLLLL " + Variables.getListFilePath());
+            //setFileName(listFilePath.get(i), id + "-" + i + ".mp4");
+            try {
+                System.out.println("LLLLLLLLLLLLL " + Variables.getListFilePath());
+                System.out.println(listFilePath.get(i));
+                copy = exportFile(listFilePath.get(i), Variables.getWorkingPath()+ "/" + id + "-" + i + ".mp4");
+                System.out.println(copy.getAbsolutePath());
+                System.out.println(copy.getPath());
 
-            String response = POST(URLupload, listFilePath.get(i));
-            System.out.println("RESPONSEEEEEEE " + " : " + response);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            listFilePath.set(i, Variables.getWorkingPath() + "/"+ id + "-" + i + ".mp4");
+
+            //String response = POST(URLupload, copy.getPath());
+            String response = POST(URLupload, id + "-" + i + ".mp4");
+            System.out.println("RESPONSEEEEEEE" + " : " + response);
         }
 
 
         return null;
+    }
+
+
+    private File exportFile(String src, String dst) throws IOException {
+
+        File expFile = new File(dst);
+        FileChannel inChannel = null;
+        FileChannel outChannel = null;
+
+        try {
+            inChannel = new FileInputStream(src).getChannel();
+            outChannel = new FileOutputStream(expFile).getChannel();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            inChannel.transferTo(0, inChannel.size(), outChannel);
+        } finally {
+            if (inChannel != null)
+                inChannel.close();
+            if (outChannel != null)
+                outChannel.close();
+        }
+
+        return expFile;
     }
 
     public static String POST(String urlString, String title, String description){
@@ -92,19 +138,15 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
 
             System.out.println("JSONNNN : " + jsonObject.toString());
 
-            /*OutputStreamWriter out = new OutputStreamWriter(connectionNew.getOutputStream());
-            out.write(jsonObject.toString());
-            out.flush();
-            out.close();*/
-
             OutputStream outputStream = connectionNew.getOutputStream();
-            outputStream.write(jsonObject.toString().getBytes()); // .getBytes("UTF-8"));
+            outputStream.write(jsonObject.toString().getBytes());
             outputStream.flush();
             outputStream.close();
 
             InputStreamReader in = new InputStreamReader(connectionNew.getInputStream());
             BufferedReader reader = new BufferedReader(in);
             StringBuilder stringBuilder = new StringBuilder();
+
             //Check if the line we are reading is not null
             while((inputLine = reader.readLine()) != null){
                 stringBuilder.append(inputLine);
@@ -131,21 +173,64 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
         return id;
     }
 
-    public static String POST(String urlString, String filePath){
+    public static String POST(String urlString, String fileName){
         String result = "";
         String inputLine;
 
+        String filePath = Variables.getWorkingPath() + "/"+ fileName ;
+        File file = new File(filePath);
+
+        int bytesRead,bytesAvailable,bufferSize;
+        byte[] buffer;
+        int maxBufferSize = 1 * 1024 * 1024;
+
         HttpURLConnection connectionUpLoad = null;
         try{
+            FileInputStream inputStream = new FileInputStream(file);
+
             URL url = new URL(urlString);
             connectionUpLoad = (HttpURLConnection) url.openConnection();
             connectionUpLoad.setRequestMethod("POST");
             connectionUpLoad.setDoOutput(true);
+            connectionUpLoad.setDoInput(true);
 
-            OutputStreamWriter out = new OutputStreamWriter(connectionUpLoad.getOutputStream());
-            out.write(filePath); // TODO Maybe to change 
+            connectionUpLoad.setRequestProperty("Connection", "Keep-Alive");
+            connectionUpLoad.setRequestProperty("Enctype", "multipart/form-data");
+            connectionUpLoad.setRequestProperty("fileToUpload",fileName);
+
+            //OutputStreamWriter out = new OutputStreamWriter(connectionUpLoad.getOutputStream());
+            //out.write(filePath); // TODO Maybe to change
+
+            //OutputStream out = connectionUpLoad.getOutputStream();
+            //out.write(file.getBytes());
+
+            DataOutputStream out = new DataOutputStream(connectionUpLoad.getOutputStream());
+
+
+            out.writeBytes("Content-Disposition: form-data; name=\"fileToUpload\";filename=\"" + fileName);
+            //out.writeBytes(filePath);
+
+            bytesAvailable = inputStream.available();
+            //selecting the buffer size as minimum of available bytes or 1 MB
+            bufferSize = Math.min(bytesAvailable,maxBufferSize);
+            //setting the buffer as byte array of size of bufferSize
+            buffer = new byte[bufferSize];
+
+            //reads bytes from FileInputStream(from 0th index of buffer to buffersize)
+            bytesRead = inputStream.read(buffer,0,bufferSize);
+
+            //loop repeats till bytesRead = -1, i.e., no bytes are left to read
+            while (bytesRead > 0){
+                //write the bytes read from inputstream
+                out.write(buffer,0,bufferSize);
+                bytesAvailable = inputStream.available();
+                bufferSize = Math.min(bytesAvailable,maxBufferSize);
+                bytesRead = inputStream.read(buffer,0,bufferSize);
+            }
+
             out.flush();
             out.close();
+            inputStream.close();
 
             InputStreamReader in = new InputStreamReader(connectionUpLoad.getInputStream());
             BufferedReader reader = new BufferedReader(in);
