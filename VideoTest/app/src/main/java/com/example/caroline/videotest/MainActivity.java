@@ -65,9 +65,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         mVideoView = (VideoView) this.findViewById(R.id.videoView);
 
         outputDirectory = Environment.getExternalStorageDirectory() + "/Movies";
-        deleteTempFiles(outputDirectory);
+
 
         try {
+            //deleteTempFiles(outputDirectory);
             savedVideo = File.createTempFile("video_", ".mp4", new File(outputDirectory));
 
         }
@@ -82,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 initRecording();
                 break;
             case R.id.start:
+
                 startRecording();
                 break;
             case R.id.stop:
