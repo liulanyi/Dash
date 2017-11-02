@@ -75,13 +75,13 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
                 //Thread.sleep(2000);
                 System.out.println("LLLLLLLLLLLLL " + Variables.getListFilePath());
                 System.out.println(listFilePath.get(i));
-                copy = exportFile(listFilePath.get(i), Variables.getWorkingPath()+ "/" + id + "-" + i + ".mp4");
+                copy = exportFile(listFilePath.get(i), Variables.getWorkingPath()+ "/" + id + "-" + (i+1) + ".mp4");
                 System.out.println(copy.getPath());
 
             }catch (Exception e){
                 e.printStackTrace();
             }
-            listFilePath.set(i, Variables.getWorkingPath() + "/"+ id + "-" + i + ".mp4");
+            listFilePath.set(i, Variables.getWorkingPath() + "/"+ id + "-" + (i+1) + ".mp4");
 
             String response = POST(URLupload, copy.getPath());
             //String response = POST(URLupload, id + "-" + i + ".mp4");

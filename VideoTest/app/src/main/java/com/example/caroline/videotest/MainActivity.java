@@ -65,9 +65,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         mVideoView = (VideoView) this.findViewById(R.id.videoView);
 
         outputDirectory = Environment.getExternalStorageDirectory() + "/Movies";
+        deleteTempFiles(outputDirectory);
 
         try {
-            savedVideo = File.createTempFile("video1_", ".mp4", new File(outputDirectory));
+            savedVideo = File.createTempFile("video_", ".mp4", new File(outputDirectory));
 
         }
         catch (Exception e){
@@ -93,9 +94,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 stopPlayRecording();
                 break;
             case R.id.send:
-                // TODO SendToServer
-                //askTitle();
-                //askDescription();
                 Intent askTitleAndDescription = new Intent(MainActivity.this, VideoTitleAndDescription.class);
                 startActivity(askTitleAndDescription);
                 break;
@@ -308,4 +306,13 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         return true;
     }
 
+    private void deleteTempFiles(String outputDirectory){
+        File root = new File(outputDirectory);
+        File[] files = root.listFiles();
+        if (files != null){
+            for (int i = 0; i<files.length; i++){
+                files[i].delete();
+            }
+        }
+    }
 }
