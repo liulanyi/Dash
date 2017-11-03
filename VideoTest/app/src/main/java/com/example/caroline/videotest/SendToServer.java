@@ -21,19 +21,15 @@ import java.util.ArrayList;
 /**
  * Created by caroline on 17/10/2017.
  */
-public class SendToServer extends AsyncTask<String, Void, Void> {
+public class SendToServer extends AsyncTask<String, Void, String> {
 
     private String title;
     private String description ;
 
     private ArrayList<String> listFilePath;
-    private ArrayList<String> oldlistFilePath ;
-    private String filePath;
 
-    String FromServer;
 
     private String URLnew = "http://monterosa.d2.comp.nus.edu.sg/~team05/new.php"; // POST, Json (title + descritpion)
-    //private String URLnew ="https://perso.telecom-paristech.fr/lperache/new.php"; // TODO change
 
     /// return number id
     /// get id
@@ -41,38 +37,31 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
     /// id-partNumber.mp4  (filepath)
     // envoyer
     private String URLupload = "http://monterosa.d2.comp.nus.edu.sg/~team05/upload.php"; //
-    //private String URLupload = "https://perso.telecom-paristech.fr/lperache/upload.php"; // TODO change
     // return text (à pop up)
     // fail : nom existe deja, trop gros (>2M), pas .mp4
 
 
 
-    /*public SendToServer(String title, String description, String filePath){ // TODO change with ListFilePath
-        this.title=title;
-        this.description=description;
-        this.filePath = filePath;
-    }*/
-
     public SendToServer(String title, String description, ArrayList<String> listFilePath){
         this.title=title;
         this.description=description;
         this.listFilePath = listFilePath;
-        this.oldlistFilePath = listFilePath;
     }
 
     @Override
-    protected Void doInBackground(String... arg0) {
+    protected String doInBackground(String... arg0) {
+        Variables.setSending(true);
         // try to connect to the server
         String id = POST(URLnew, title, description);
+        boolean hasResponseChanged = false ;
+        String responseUploadOk = "The file has been uploaded" ;
 
         int numOfVideos = listFilePath.size();
         System.out.println("NNNNNNNNNNNNNNNNN " + numOfVideos);
         File copy = null ;
         // rename the videos
         for (int i=0; i<numOfVideos; i++){
-            //setFileName(listFilePath.get(i), id + "-" + i + ".mp4");
             try {
-                //Thread.sleep(2000);
                 System.out.println("LLLLLLLLLLLLL " + Variables.getListFilePath());
                 System.out.println(listFilePath.get(i));
                 copy = exportFile(listFilePath.get(i), Variables.getWorkingPath()+ "/" + id + "-" + (i+1) + ".mp4");
@@ -81,16 +70,27 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
             }catch (Exception e){
                 e.printStackTrace();
             }
-            listFilePath.set(i, Variables.getWorkingPath() + "/"+ id + "-" + (i+1) + ".mp4");
+            listFilePath.set(i, Variables.getWorkingPath() + "/" + id + "-" + (i + 1) + ".mp4");
 
             String response = POST(URLupload, copy.getPath());
-            //String response = POST(URLupload, id + "-" + i + ".mp4");
             System.out.println("RESPONSEEEEEEE" + " : " + response);
 
+            // if one segment has not been uploaded well
+            if (response != responseUploadOk){
+                hasResponseChanged=true;
+            }
+
+        }
+        if (hasResponseChanged){
+            Variables.setResponseUpload("Sorry, your file has not been uploaded");
+        } else {
+            Variables.setResponseUpload("Your file has been uploaded");
         }
 
+        deleteTempFiles(Variables.getWorkingPath());
 
-        return null;
+        Variables.setSending(false);
+        return Variables.getResponseUpload();
     }
 
 
@@ -285,5 +285,15 @@ public class SendToServer extends AsyncTask<String, Void, Void> {
         }
 
         return result;
+    }
+
+    private void deleteTempFiles(String outputDirectory){
+        File root = new File(outputDirectory);
+        File[] files = root.listFiles();
+        if (files != null){
+            for (int i = 0; i<files.length; i++){
+                files[i].delete();
+            }
+        }
     }
 }

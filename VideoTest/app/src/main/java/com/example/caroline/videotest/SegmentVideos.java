@@ -24,21 +24,7 @@ public class SegmentVideos {
 
     private double duration ;
     private int numberOfSmallVideos;
-    //private int startTime = 0;
-    private double startTime = 0.0;
-    private double endTime;
-    private double splitDuration = 3.0;
-    private double lastStartTime;
-    private String filePath;
 
-
-    public void setList (String filepath){
-        this.filePath = filepath ;
-        ArrayList<String> list = new ArrayList<String>();
-        list.add(filepath);
-
-        Variables.setListFilePath(list);
-    }
 
     public void segmentVideo(){
         double startTime = 0 ;

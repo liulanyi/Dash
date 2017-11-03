@@ -29,22 +29,21 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
 
     // buttons
-    private Button initBtn = null;
     private Button startBtn = null ;
     private Button stopBtn = null;
     private Button reviewBtn = null;
     private Button stopReviewBtn = null;
     private Button sendBtn = null;
-    private Button cutBtn = null;
     private TextView recordingMsg ;
 
     private static final String TAG = "RecordVideo";
 
     private MediaRecorder recorder = null;
-    private String outputDirectory = null;
 
     private String workingPath ;
     private String filePathWithoutExt ;
+
+    private boolean CameraReleased = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,36 +53,20 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         this.workingPath = Environment.getExternalStorageDirectory() + "/Movies";
         Variables.setWorkingPath(workingPath);
         // references of the buttons
-        initBtn = (Button) findViewById(R.id.init);
         startBtn = (Button) findViewById(R.id.start);
         stopBtn = (Button) findViewById(R.id.stop);
         reviewBtn = (Button) findViewById(R.id.review);
         stopReviewBtn = (Button) findViewById(R.id.sreview);
         sendBtn = (Button) findViewById(R.id.send);
-        cutBtn = (Button) findViewById(R.id.cut);
         recordingMsg = (TextView) findViewById(R.id.recording);
         mVideoView = (VideoView) this.findViewById(R.id.videoView);
 
-        outputDirectory = Environment.getExternalStorageDirectory() + "/Movies";
 
-
-        try {
-            //deleteTempFiles(outputDirectory);
-            savedVideo = File.createTempFile("video_", ".mp4", new File(outputDirectory));
-
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
     }
 
     public void buttonTapped (View view){
         switch (view.getId()){
-            case R.id.init:
-                initRecording();
-                break;
             case R.id.start:
-
                 startRecording();
                 break;
             case R.id.stop:
@@ -96,32 +79,41 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 stopPlayRecording();
                 break;
             case R.id.send:
+                cutVideo();
                 Intent askTitleAndDescription = new Intent(MainActivity.this, VideoTitleAndDescription.class);
                 startActivity(askTitleAndDescription);
                 break;
-            case R.id.cut:
-                cutVideo();
-
         }
     }
 
-    private void initRecording() {
-        if (recorder != null) {
-            return;
-        }
 
+    private void startRecording() {
+        try{
+            stopPlayRecording(); // in case we were reviewing the recorded video
+            mCamera = Camera.open();
+            mCamera.lock();
+            mSurHolder = mVideoView.getHolder();
+            mSurHolder.addCallback(this);
+            mSurHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+            savedVideo = File.createTempFile("video_", ".mp4", new File(workingPath));
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
 
         if (savedVideo.exists())
             savedVideo.delete();
+
         filePath = savedVideo.getPath();
+        System.out.println("FILEPATH : " + filePath);
         Variables.setFilePath(filePath);
 
         filePathWithoutExt = (filePath != null) ? filePath.substring(0, filePath.indexOf('.')) : "";
-        //filePathWithoutExt =  savedVideo.getName().substring(0, savedVideo.getName().indexOf('.'));
         Variables.setFilePathWithoutExt(filePathWithoutExt);
 
         try {
-            mCamera.stopPreview();
+            //mCamera.stopPreview();
             recorder = new MediaRecorder();
             recorder.setCamera(mCamera);
             mCamera.unlock();
@@ -141,20 +133,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             recorder.setOutputFile(filePath);
 
             recorder.prepare();
-            initBtn.setEnabled(false);
-            startBtn.setEnabled(true);
-        }
-        catch(Exception e){
-            Toast.makeText(getApplicationContext(), "error init : " + e.getMessage(), Toast.LENGTH_LONG).show();
-            e.printStackTrace();
-        }
-    }
 
-    private void startRecording() {
-        //recorder.setOnInfoListener(this);
-        //recorder.setOnErrorListener(this);
-        try{
-            //Thread.sleep(1000);
             recorder.start();
             recordingMsg.setText("recording");
             startBtn.setEnabled(false);
@@ -167,31 +146,29 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     private void stopRecording() {
         if (recorder != null){
-            //recorder.setOnErrorListener(null);
-            //recorder.setOnInfoListener(null);
-
             try{
                 recorder.stop();
             }
             catch (IllegalStateException e){
                 e.printStackTrace();
             }
-            releaseRecorder();
             recordingMsg.setText(" ");
-            releaseCamera();
-            startBtn.setEnabled(false);
+            startBtn.setEnabled(true);
             stopBtn.setEnabled(false);
             reviewBtn.setEnabled(true);
-            cutBtn.setEnabled(true);
+            sendBtn.setEnabled(true);
         }
     }
 
     private void playRecording() {
+        releaseRecorder();
+        releaseCamera();
         MediaController mc = new MediaController(this);
         mVideoView.setMediaController(mc);
         mVideoView.setVideoPath(filePath);
         mVideoView.start();
         stopReviewBtn.setEnabled(true);
+
     }
 
     private void stopPlayRecording() {
@@ -200,10 +177,12 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
 
     private void cutVideo() {
+        if (!CameraReleased) {
+            releaseRecorder();
+            releaseCamera();
+        }
         SegmentVideos segmentVideos = new SegmentVideos();
-        //segmentVideos.setList(filePath);
         segmentVideos.segmentVideo();
-        sendBtn.setEnabled(true);
     }
 
     private void releaseRecorder() {
@@ -222,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             }
             mCamera.release();
             mCamera = null;
+            CameraReleased=true;
         }
     }
 
@@ -235,7 +215,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             Toast.makeText(getApplicationContext(), "surfaceCreated : " + e.getMessage(), Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
-        initBtn.setEnabled(true);
+        while (Variables.getSending()==true){
+            startBtn.setEnabled(false);
+        }
+        startBtn.setEnabled(true);
     }
 
     @Override
@@ -262,13 +245,11 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     protected void onResume(){
         //Log.v(TAG, "in onResume");
         super.onResume();
-        initBtn.setEnabled(false);
         startBtn.setEnabled(false);
         stopBtn.setEnabled(false);
         reviewBtn.setEnabled(false);
         stopReviewBtn.setEnabled(false);
         sendBtn.setEnabled(false);
-        cutBtn.setEnabled(false);
         if(!initCamera())
             finish();
     }
@@ -308,13 +289,4 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         return true;
     }
 
-    private void deleteTempFiles(String outputDirectory){
-        File root = new File(outputDirectory);
-        File[] files = root.listFiles();
-        if (files != null){
-            for (int i = 0; i<files.length; i++){
-                files[i].delete();
-            }
-        }
-    }
 }

@@ -9,23 +9,14 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.caroline.videotest.MainActivity">
 
-    <Button
-        android:id="@+id/init"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:text="Init"
-        android:onClick="buttonTapped"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
-
 
     <VideoView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/videoView"
         android:layout_centerHorizontal="true"
-        android:layout_below="@+id/start"
-        android:layout_alignParentBottom="true" />
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/stop" />
 
     <Button
         android:layout_width="wrap_content"
@@ -33,7 +24,6 @@
         android:text="start"
         android:id="@+id/start"
         android:onClick="buttonTapped"
-        android:layout_below="@+id/init"
         android:layout_alignParentStart="true" />
 
     <Button
@@ -42,8 +32,8 @@
         android:text="stop"
         android:id="@+id/stop"
         android:onClick="buttonTapped"
-        android:layout_below="@+id/review"
-        android:layout_toEndOf="@+id/start" />
+        android:layout_below="@+id/start"
+        android:layout_alignParentStart="true" />
 
     <Button
         android:layout_width="wrap_content"
@@ -51,8 +41,8 @@
         android:text="review"
         android:id="@+id/review"
         android:onClick="buttonTapped"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/stop" />
+        android:layout_above="@+id/recording"
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:layout_width="wrap_content"
@@ -68,10 +58,8 @@
         android:layout_height="wrap_content"
         android:text=" "
         android:id="@+id/recording"
-        android:layout_alignEnd="@+id/stop"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/init"
-        android:layout_above="@+id/start" />
+        android:layout_below="@+id/start"
+        android:layout_toEndOf="@+id/start" />
 
     <Button
         android:layout_width="wrap_content"
@@ -82,12 +70,4 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="cut"
-        android:id="@+id/cut"
-        android:onClick="buttonTapped"
-        android:layout_below="@+id/review"
-        android:layout_alignParentEnd="true" />
 </RelativeLayout>
