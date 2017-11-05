@@ -50,8 +50,9 @@ public class SendToServer extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... arg0) {
-        Variables.setSending(true);
+        //Variables.setSending(true);
         // try to connect to the server
+        deleteTempFiles(Variables.getFilePath());
         String id = POST(URLnew, title, description);
         boolean hasResponseChanged = false ;
         String responseUploadOk = "The file has been uploaded" ;
@@ -65,6 +66,7 @@ public class SendToServer extends AsyncTask<String, Void, String> {
                 System.out.println("LLLLLLLLLLLLL " + Variables.getListFilePath());
                 System.out.println(listFilePath.get(i));
                 copy = exportFile(listFilePath.get(i), Variables.getWorkingPath()+ "/" + id + "-" + (i+1) + ".mp4");
+                deleteTempFiles(listFilePath.get(i));
                 System.out.println(copy.getPath());
 
             }catch (Exception e){
@@ -74,6 +76,7 @@ public class SendToServer extends AsyncTask<String, Void, String> {
 
             String response = POST(URLupload, copy.getPath());
             System.out.println("RESPONSEEEEEEE" + " : " + response);
+            deleteTempFiles(copy.getPath());
 
             // if one segment has not been uploaded well
             if (response != responseUploadOk){
@@ -87,9 +90,9 @@ public class SendToServer extends AsyncTask<String, Void, String> {
             Variables.setResponseUpload("Your file has been uploaded");
         }
 
-        deleteTempFiles(Variables.getWorkingPath());
+        //deleteTempFiles(Variables.getWorkingPath());
 
-        Variables.setSending(false);
+        //Variables.setSending(false);
         return Variables.getResponseUpload();
     }
 
@@ -287,13 +290,11 @@ public class SendToServer extends AsyncTask<String, Void, String> {
         return result;
     }
 
-    private void deleteTempFiles(String outputDirectory){
-        File root = new File(outputDirectory);
-        File[] files = root.listFiles();
-        if (files != null){
-            for (int i = 0; i<files.length; i++){
-                files[i].delete();
-            }
+    private void deleteTempFiles(String filePath){
+        File file = new File(filePath);
+        //File[] files = root.listFiles();
+        if (file != null){
+            file.delete();
         }
     }
 }

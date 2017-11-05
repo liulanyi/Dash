@@ -43,8 +43,8 @@ public class Variables {
     public static String getResponseUpload(){return responseUpload;}
     public static void setResponseUpload(String responseUpload){Variables.responseUpload = responseUpload;}
 
-    public static boolean getSending(){return sending;}
-    public static void setSending(boolean sending){Variables.sending = sending;}
+    //public static boolean getSending(){return sending;}
+    //public static void setSending(boolean sending){Variables.sending = sending;}
 
 }
 

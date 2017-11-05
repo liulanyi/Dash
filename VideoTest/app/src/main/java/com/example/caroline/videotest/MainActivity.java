@@ -215,9 +215,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             Toast.makeText(getApplicationContext(), "surfaceCreated : " + e.getMessage(), Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
-        while (Variables.getSending()==true){
-            startBtn.setEnabled(false);
-        }
+        //while (Variables.getSending()==true){
+         //   startBtn.setEnabled(false);
+        //}
         startBtn.setEnabled(true);
     }
 
