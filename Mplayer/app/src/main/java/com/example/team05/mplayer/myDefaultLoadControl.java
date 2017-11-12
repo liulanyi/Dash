@@ -145,10 +145,12 @@ public class myDefaultLoadControl implements LoadControl{
         for (int i = 0; i < renderers.length; i++) {
             if (trackSelections.get(i) != null) {
                 targetBufferSize += Util.getDefaultBufferSize(renderers[i].getTrackType());
+                //Log.d(TAG,String.valueOf(Util.getDefaultBufferSize(renderers[i].getTrackType())));
             }
         }
+        //Log.d(TAG,String.valueOf(targetBufferSize));
         allocator.setTargetBufferSize(targetBufferSize);
-        //Log.d(TAG,"Total Buffer size "+ String.valueOf(targetBufferSize));
+        //Log.d(TAG,"Total Buffer size "+ String.valueOf(allocator.getTotalBytesAllocated()));
     }
 
     @Override
@@ -179,6 +181,7 @@ public class myDefaultLoadControl implements LoadControl{
         boolean wasBuffering = isBuffering;
         isBuffering = bufferTimeState == BELOW_LOW_WATERMARK
                 || (bufferTimeState == BETWEEN_WATERMARKS && !targetBufferSizeReached);
+        //Log.d(TAG,"Buffering?"+isBuffering);
         if (priorityTaskManager != null && isBuffering != wasBuffering) {
             if (isBuffering) {
                 priorityTaskManager.add(C.PRIORITY_PLAYBACK);
@@ -192,7 +195,7 @@ public class myDefaultLoadControl implements LoadControl{
     private synchronized int getBufferTimeState(long bufferedDurationUs) {
         //Log.d(TAG,"buffer duration"+String.valueOf(bufferedDurationUs/1000));
         bufferDur=bufferedDurationUs/1000;
-        Log.d(TAG,"buffer size: "+String.valueOf(bufferDur));
+        //Log.d(TAG,"buffer size: "+String.valueOf(bufferDur));
         return bufferedDurationUs > maxBufferUs ? ABOVE_HIGH_WATERMARK
                 : (bufferedDurationUs < minBufferUs ? BELOW_LOW_WATERMARK : BETWEEN_WATERMARKS);
     }

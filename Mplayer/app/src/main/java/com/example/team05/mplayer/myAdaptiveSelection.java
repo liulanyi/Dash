@@ -231,7 +231,7 @@ public class myAdaptiveSelection extends BaseTrackSelection {
             reason = C.SELECTION_REASON_ADAPTIVE;
         }
 
-        Log.d(TAG,"Current Selection bitrate"+String.valueOf(getSelectedFormat().bitrate));
+        //Log.d(TAG,"Current Selection bitrate"+String.valueOf(getSelectedFormat().bitrate));
     }
 
     @Override
@@ -289,6 +289,7 @@ public class myAdaptiveSelection extends BaseTrackSelection {
         long bitrateEstimate = bandwidthMeter.getBitrateEstimate();
         long effectiveBitrate = bitrateEstimate == BandwidthMeter.NO_ESTIMATE
                 ? maxInitialBitrate : (long) (bitrateEstimate * bandwidthFraction);
+        //Log.d(TAG,"Effective bandwidth"+effectiveBitrate);
         int lowestBitrateNonBlacklistedIndex = 0;
         for (int i = 0; i < length; i++) {
             if (nowMs == Long.MIN_VALUE || !isBlacklisted(i, nowMs)) {

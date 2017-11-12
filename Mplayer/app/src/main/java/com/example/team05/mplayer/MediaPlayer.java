@@ -51,7 +51,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class MediaPlayer extends AppCompatActivity implements ExoPlayer.EventListener{
+public class MediaPlayer extends AppCompatActivity {
     private static final String TAG="MEDIA_PLAYER";
     SimpleExoPlayerView playerView;
     SimpleExoPlayer player;
@@ -202,22 +202,6 @@ public class MediaPlayer extends AppCompatActivity implements ExoPlayer.EventLis
 
         // Start playing media
         player.prepare(mediaSource,false, false);
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    //Log.d(TAG,"Cureent buffer size"+ String.valueOf(loadControl.getBufferDuration()));
-
-
-                }catch (Exception e){
-                    Log.e(TAG,"timer stop");
-                    timer.cancel();
-                }
-
-            }
-        },100,1500);
-
-
 
     }
 
@@ -269,38 +253,4 @@ public class MediaPlayer extends AppCompatActivity implements ExoPlayer.EventLis
         initializePlayer();
     }
 
-    @Override
-    public void onTimelineChanged(Timeline timeline, Object manifest) {
-
-    }
-
-    @Override
-    public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-
-    }
-
-    @Override
-    public void onLoadingChanged(boolean isLoading) {
-
-    }
-
-    @Override
-    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-
-    }
-
-    @Override
-    public void onPlayerError(ExoPlaybackException error) {
-
-    }
-
-    @Override
-    public void onPositionDiscontinuity() {
-
-    }
-
-    @Override
-    public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-
-    }
 }
