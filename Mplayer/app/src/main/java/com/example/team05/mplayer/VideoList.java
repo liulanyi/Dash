@@ -34,30 +34,21 @@ import java.util.List;
 public class VideoList extends AppCompatActivity implements AdapterView.OnItemClickListener{
     private static final String TAG="VideoList";
     private ListView listView;
-   // private ListAdapter adapter;
     private VideoListAdapter adapter;
-    private List<String> data;
-//    private List<String> playListUrl;
     private List<VideoInfo> playlist;
-    private String rootURL = "http://monterosa.d1.comp.nus.edu.sg/~team05/video-info.php";
+    private String rootURL = "http://monterosa.d2.comp.nus.edu.sg/~team05/video-info-DASH.php";
     //private String rootURL = "http://192.168.1.205/androidserver/index.php";
-    private int loadPosition;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_list);
 
         listView = (ListView)findViewById(R.id.listview);
-        data = new ArrayList<String>();
-       // playListUrl = new ArrayList<String>();
         playlist=new ArrayList<>();
         adapter=new VideoListAdapter(this,playlist);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(VideoList.this);
         new RetrievePlaylist().execute(rootURL);
-        loadPosition=0;
-        //adapter=new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1,getData(loadPosition));
 
         Button btnLoadMore = new Button(this);
         btnLoadMore.setText(getString(R.string.btn_load_more));
@@ -100,16 +91,6 @@ public class VideoList extends AppCompatActivity implements AdapterView.OnItemCl
     }
 
 
-    private List<String> getData(int last){
-
-         //List<String> data = new ArrayList<String>();
-        for(int i=last;i<playlist.size();i++){
-            data.add(playlist.get(i).getTitle());
-            //playListUrl.add(getString(R.string.media_url_mp4));
-        }
-        loadPosition=playlist.size();
-        return data;
-    }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -133,30 +114,27 @@ public class VideoList extends AppCompatActivity implements AdapterView.OnItemCl
             String result;
             String inputLine;
             try {
-                //Create a URL object holding our url
                 URL myUrl = new URL(stringUrl);
-                //Create a connection
                 HttpURLConnection connection =(HttpURLConnection) myUrl.openConnection();
+
                 //Set methods and timeouts
                 connection.setRequestMethod(REQUEST_METHOD);
                 connection.setReadTimeout(READ_TIMEOUT);
                 connection.setConnectTimeout(CONNECTION_TIMEOUT);
-                //Connect to our url
                 connection.connect();
+
                 //Create a new InputStreamReader
                 InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());
-                //Create a new buffered reader and String Builder
                 BufferedReader reader = new BufferedReader(streamReader);
                 StringBuilder stringBuilder = new StringBuilder();
-                //Check if the line we are reading is not null
+
                 while((inputLine = reader.readLine()) != null){
                     stringBuilder.append(inputLine);
                 }
-                //Close our InputStream and Buffered reader
+
                 reader.close();
                 streamReader.close();
                 connection.disconnect();
-                //Set our result equal to our stringBuilder
                 result = stringBuilder.toString();
             }catch(IOException e){
                 e.printStackTrace();
@@ -165,13 +143,12 @@ public class VideoList extends AppCompatActivity implements AdapterView.OnItemCl
 
             //parse the JsonObject
             try{
-                //JSONObject jObject = new JSONObject(result);
                 JSONArray jsonarray=new JSONArray(result);
                 for(int i=0;i<jsonarray.length();i++){
                     JSONObject jObject=jsonarray.getJSONObject(i);
                     VideoInfo videoMeta=new VideoInfo(jObject.getString("title"),
                             jObject.getString("description"),
-                            jObject.getString("url"));
+                            jObject.getString("url_DASH"));
 
                     playlist.add(videoMeta);
                     Log.i(TAG,""+playlist.size());

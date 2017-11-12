@@ -15,11 +15,11 @@
         android:id="@+id/listDescription"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/listTitle"
-        android:layout_marginTop="5dp"
         android:maxLines="4"
         android:text="The List item description"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:layout_below="@+id/listTitle"
+        android:layout_alignParentStart="true" />
 
 
 </RelativeLayout>
