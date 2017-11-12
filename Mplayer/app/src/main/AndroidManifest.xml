@@ -17,7 +17,6 @@
             android:label="@string/title_activity_media_player"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="landscape"
             >
         </activity>
 

@@ -200,7 +200,7 @@ public final class EventLogger implements ExoPlayer.EventListener,AudioRendererE
     @Override
     //current window or period index changes.
     public void onPositionDiscontinuity() {
-        //Log.d(TAG, "positionDiscontinuity");
+        Log.d(TAG, "positionDiscontinuity");
     }
 
     @Override
@@ -233,8 +233,8 @@ public final class EventLogger implements ExoPlayer.EventListener,AudioRendererE
     @Override
     // called when the format of the media being consumed by renderer changes
     public void onAudioInputFormatChanged(Format format) {
-       // Log.d(TAG, "audioFormatChanged [" + getSessionTimeString() + ", " + Format.toLogString(format)
-       //         + "]");
+       Log.d(TAG, "audioFormatChanged [" + getSessionTimeString() + ", " + Format.toLogString(format)
+                + "]");
     }
 
     @Override
@@ -264,12 +264,13 @@ public final class EventLogger implements ExoPlayer.EventListener,AudioRendererE
 
     @Override
     public void onLoadStarted(DataSpec dataSpec, int dataType, int trackType, Format trackFormat, int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs, long mediaEndTimeMs, long elapsedRealtimeMs) {
-        Log.d(TAG,"STREAMLET["+getSessionTimeString()+"start time"+ Long.toString(mediaStartTimeMs));
+        Log.d(TAG,"STREAMLET ["+getSessionTimeString()+"start time "+ Long.toString(mediaStartTimeMs)+" ]");
+        Log.d(TAG,"STREAMLET ["+getSessionTimeString()+"Format bitrate"+ String.valueOf(trackFormat==null? "No format":trackFormat.bitrate)+" ]");
     }
 
     @Override
     public void onLoadCompleted(DataSpec dataSpec, int dataType, int trackType, Format trackFormat, int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs, long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs, long bytesLoaded) {
-
+        //Log.d(TAG,"Track format ["+getSessionTimeString()+"bitrate"+ String.valueOf(trackFormat.bitrate)+" ]");
     }
 
     @Override
@@ -284,7 +285,7 @@ public final class EventLogger implements ExoPlayer.EventListener,AudioRendererE
 
     @Override
     public void onUpstreamDiscarded(int trackType, long mediaStartTimeMs, long mediaEndTimeMs) {
-
+        Log.d(TAG,"Media discard "+getSessionTimeString());
     }
 
     @Override
@@ -322,7 +323,7 @@ public final class EventLogger implements ExoPlayer.EventListener,AudioRendererE
     @Override
     // Called to report the number of frames dropped by renderer
     public void onDroppedFrames(int count, long elapsedMs) {
-        //Log.d(TAG, "droppedFrames [" + getSessionTimeString() + ", " + count + "]");
+        Log.d(TAG, "droppedFrames [" + getSessionTimeString() + ", " + count + "]");
     }
 
     @Override

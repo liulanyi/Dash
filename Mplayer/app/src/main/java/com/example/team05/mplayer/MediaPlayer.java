@@ -15,11 +15,16 @@ import android.widget.TextView;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
@@ -29,22 +34,28 @@ import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.DebugTextViewHelper;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+import com.google.android.exoplayer2.upstream.Allocator;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultAllocator;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
+import java.sql.Time;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class MediaPlayer extends AppCompatActivity {
+
+public class MediaPlayer extends AppCompatActivity implements ExoPlayer.EventListener{
     private static final String TAG="MEDIA_PLAYER";
     SimpleExoPlayerView playerView;
     SimpleExoPlayer player;
     private boolean playWhenReady;
-    private int resumeWindow;
     private long resumePosition;
 
     private DefaultBandwidthMeter BANDWIDTH_METER;
@@ -60,13 +71,15 @@ public class MediaPlayer extends AppCompatActivity {
     private Handler mainHandler;
     private EventLogger eventLogger;
 
+    private Timer timer;
+    private int resumeWindow;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.i(TAG,"Device on create");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_media_player);
-
         mainHandler = new Handler();
         retryButton=(Button)findViewById(R.id.button);
         debugText=(TextView) findViewById(R.id.textView3);
@@ -79,6 +92,7 @@ public class MediaPlayer extends AppCompatActivity {
         uri=Uri.parse(intent.getStringExtra("uri"));
         String title=intent.getStringExtra("title");
         playWhenReady=true;
+        timer=new Timer();
     }
 
     @Override
@@ -150,8 +164,7 @@ public class MediaPlayer extends AppCompatActivity {
 
         // Adaptive Track Selector will determine the best track based on bandwidth.
         // The part needs to be read
-        TrackSelection.Factory adaptiveTrackSelectionFactory =
-                new AdaptiveTrackSelection.Factory(BANDWIDTH_METER);
+        final TrackSelection.Factory adaptiveTrackSelectionFactory = new myAdaptiveSelection.Factory(BANDWIDTH_METER);
         trackSelector = new DefaultTrackSelector(adaptiveTrackSelectionFactory);
         eventLogger = new EventLogger((MappingTrackSelector) trackSelector);
 
@@ -159,7 +172,7 @@ public class MediaPlayer extends AppCompatActivity {
         DefaultRenderersFactory rendererFactory=new DefaultRenderersFactory(this);
 
         // Create Load Control. Managing buffer. Change buffer parameters
-        DefaultLoadControl loadControl=new DefaultLoadControl();
+        final myDefaultLoadControl loadControl=new myDefaultLoadControl();
 
         // Create the media player and set play attributes
         player = ExoPlayerFactory.newSimpleInstance(
@@ -177,6 +190,7 @@ public class MediaPlayer extends AppCompatActivity {
         Log.d(TAG,"Current Window"+resumePosition);
         player.seekTo(resumePosition);
         player.setPlayWhenReady(playWhenReady);
+        //player.setVolume(0);
 
 
         // Create media source to play
@@ -188,7 +202,22 @@ public class MediaPlayer extends AppCompatActivity {
 
         // Start playing media
         player.prepare(mediaSource,false, false);
-        
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    //Log.d(TAG,"Cureent buffer size"+ String.valueOf(loadControl.getBufferDuration()));
+
+
+                }catch (Exception e){
+                    Log.e(TAG,"timer stop");
+                    timer.cancel();
+                }
+
+            }
+        },100,1500);
+
+
 
     }
 
@@ -240,5 +269,38 @@ public class MediaPlayer extends AppCompatActivity {
         initializePlayer();
     }
 
+    @Override
+    public void onTimelineChanged(Timeline timeline, Object manifest) {
 
+    }
+
+    @Override
+    public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+
+    }
+
+    @Override
+    public void onLoadingChanged(boolean isLoading) {
+
+    }
+
+    @Override
+    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+
+    }
+
+    @Override
+    public void onPlayerError(ExoPlaybackException error) {
+
+    }
+
+    @Override
+    public void onPositionDiscontinuity() {
+
+    }
+
+    @Override
+    public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
+
+    }
 }

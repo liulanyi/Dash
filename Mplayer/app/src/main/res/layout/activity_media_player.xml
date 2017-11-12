@@ -41,14 +41,14 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentTop="true"
-                    android:background="@color/exo_edit_mode_background_color"
+                    android:background="@android:color/darker_gray"
                     android:elevation="0dp"
                     android:fontFamily="monospace"
                     android:onClick="rePlay"
                     android:text="Retry"
                     android:textAllCaps="true"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                    android:textColor="@android:color/background_dark"
+                    android:textColor="@color/white"
                     android:textSize="18sp"
                     android:visibility="visible" />
 
