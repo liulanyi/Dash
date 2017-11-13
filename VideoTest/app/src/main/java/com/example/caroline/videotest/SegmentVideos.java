@@ -150,7 +150,7 @@ public class SegmentVideos {
 
                 for (int j = 0; j < track.getSampleDurations().length; j++) {
                     long delta = track.getSampleDurations()[j];
-                    if (currentTime > lastTime && currentTime <= startTime) { //currentTime > lastTime &&
+                    if (currentTime <= startTime) { //currentTime > lastTime &&
                         // current sample is still before the new starttime
                         startSample = currentSample;
                     }
@@ -161,7 +161,6 @@ public class SegmentVideos {
                         // current sample is after the end of the cropped video
                         break;
                     }
-                    lastTime = currentTime;
                     currentTime += (double) delta / (double) track.getTrackMetaData().getTimescale();
                     currentSample++;
                 }
